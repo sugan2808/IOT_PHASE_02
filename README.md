@@ -174,3 +174,46 @@ reliability. By providing real-time information to residents and predicting issu
 before they occur, we ensure a better public service and reduced maintenance
 costs. This innovative approach not only benefits communities but also
 demonstrates the potential of technology to address urban challenges.
+Code:
+
+
+import pandas as pd
+from sklearn.ensemble import IsolationForest
+import time
+
+# Sample data representing water flow rates
+data = {
+    'Timestamp': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    'FlowRate': [100, 95, 90, 88, 87, 85, 40, 38, 35, 30]
+}
+
+# Create a DataFrame from the sample data
+df = pd.DataFrame(data)
+
+# Training the Isolation Forest model
+model = IsolationForest(contamination=0.1)  # Adjust the contamination parameter
+
+# Fit the model on the flow rate data
+model.fit(df[['FlowRate']])
+
+# Function to predict anomalies and trigger maintenance alerts
+def predict_anomalies(data_point):
+    # Reshape the data point to match the model's input format
+    prediction = model.predict([[data_point]])
+    if prediction[0] == -1:
+        return "Maintenance Alert: Anomaly detected in flow rate!"
+    return "Flow rate is normal."
+
+# Simulate real-time data collection
+for i in range(11, 20):
+    new_data_point = 35 + i % 4  # Simulated fluctuation in flow rate
+    df = df.append({'Timestamp': i, 'FlowRate': new_data_point}, ignore_index=True)
+    
+    # Use the predictive maintenance model
+    alert = predict_anomalies(new_data_point)
+    
+    # Print results
+    print(f'Time: {i}, Flow Rate: {new_data_point}, {alert}')
+    
+    # Pause to simulate real-time data collection
+    time.sleep(1)
